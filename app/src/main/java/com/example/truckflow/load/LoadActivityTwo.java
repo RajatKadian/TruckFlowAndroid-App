@@ -11,7 +11,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.truckflow.R;
 import com.example.truckflow.databinding.ActivityLoadTwoBinding;
@@ -43,6 +45,10 @@ public class LoadActivityTwo extends AppCompatActivity implements OnMapReadyCall
     private  ActivityLoadTwoBinding binding;
 
     String streetNumber,streetName,city,state,country,postalCode,latitude,longitude,selectedDate;
+
+    private boolean isEditTextEmpty(EditText editText) {
+        return editText.getText().toString().trim().isEmpty();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,23 +149,52 @@ public class LoadActivityTwo extends AppCompatActivity implements OnMapReadyCall
             @Override
             public void onClick(View v) {
 
-                Intent currentIntent = new Intent(LoadActivityTwo.this, LoadActivityThree.class);
+                if (isEditTextEmpty((EditText) unitTV) || isEditTextEmpty((EditText) streetNameTV) || isEditTextEmpty((EditText) cityTV) ||
+                        isEditTextEmpty((EditText) provinceTV) || isEditTextEmpty((EditText) countryTV) || isEditTextEmpty((EditText) zipcodeTV) ||
+                        selectedDate == null) {
 
-                currentIntent.putExtra("streetNumberPU",streetNumber);
-                currentIntent.putExtra("streetNamePU",streetName);
-                currentIntent.putExtra("cityPU",city);
-                currentIntent.putExtra("statePU",state);
-                currentIntent.putExtra("countryPU",country);
-                currentIntent.putExtra("postalCodePU",postalCode);
-                currentIntent.putExtra("longitudePU",longitude);
-                currentIntent.putExtra("latitudePU",latitude);
+                    // Show an error message indicating that all fields are required
+                    Toast.makeText(LoadActivityTwo.this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
+                }
 
-                currentIntent.putExtra("datePU",selectedDate);
+                else {
 
-                //full address
-                String fullAddress = streetNumber + " " + streetName + ", " + city + ", " + state + ", " + country + " " + postalCode;
-                currentIntent.putExtra("addressPU",fullAddress);
-                startActivity(currentIntent);
+                    Intent currentIntent = new Intent(LoadActivityTwo.this, LoadActivityThree.class);
+
+                    Bundle extras = getIntent().getExtras();
+                    String role = "";
+                    String email = "";
+
+                    if (extras != null) {
+                        role = extras.getString("role");
+                        email = extras.getString("EMAIL_KEY");
+                    }
+
+                    currentIntent.putExtra("streetNumberPU",streetNumber);
+                    currentIntent.putExtra("streetNamePU",streetName);
+                    currentIntent.putExtra("cityPU",city);
+                    currentIntent.putExtra("statePU",state);
+                    currentIntent.putExtra("countryPU",country);
+                    currentIntent.putExtra("postalCodePU",postalCode);
+                    currentIntent.putExtra("longitudePU",longitude);
+                    currentIntent.putExtra("latitudePU",latitude);
+
+                    currentIntent.putExtra("datePU",selectedDate);
+                    currentIntent.putExtra("role", role);
+                    currentIntent.putExtra("EMAIL_KEY", email);
+
+                    Log.d("got email and role", role + email);
+
+                    //full address
+                    String fullAddress = streetNumber + " " + streetName + ", " + city + ", " + state + ", " + country + " " + postalCode;
+                    currentIntent.putExtra("addressPU",fullAddress);
+                    startActivity(currentIntent);
+
+
+
+                }
+
+
             }
         });
 

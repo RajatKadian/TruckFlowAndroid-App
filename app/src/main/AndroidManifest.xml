@@ -17,6 +17,9 @@
         android:theme="@style/Theme.Truckflow"
         tools:targetApi="31">
         <activity
+            android:name=".loadView"
+            android:exported="false" />
+        <activity
             android:name=".communication.ChatActivity"
             android:exported="false" />
         <activity

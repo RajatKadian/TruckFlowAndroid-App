@@ -73,9 +73,24 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
             public void onClick(View v) {
                 //condition if shipper then take to load post
                 Intent i = new Intent(Home.this, LoadActivityTwo.class);
+
+
+                Bundle extras = getIntent().getExtras();
+
+                String role = "";
+                if (extras != null && extras.containsKey("role")) {
+                    role = extras.getString("role");
+                }
+                if (extras != null && extras.containsKey("EMAIL_KEY")) {
+                    String email = extras.getString("EMAIL_KEY");
+                    i.putExtra("EMAIL_KEY", email);
+                }
+
+                i.putExtra("role", role);
+
                 startActivity(i);
 
-                //else trucker then take to post truck
+                //else trucker then take to  truck
 
             }
         });
@@ -91,9 +106,11 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         Bundle extras = getIntent().getExtras();
 
         String role = "";
-        if (extras != null) {
+        if (extras != null  && extras.containsKey("role")) {
             role = extras.getString("role");
         }
+
+
 
         if(role.equals("shipper")) {
 
@@ -105,11 +122,14 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                 }
             });
 
-        } else {
+        } else if (role.equals("trucker")) {
+
+            Log.d("load for trucker", role);
 
             getMyLoads(new FirestoreLoadCallback() {
                 @Override
                 public void onLoadsReceived(List<Load> loadData) {
+
                     loadAdapter = new LoadAdapter(loadData);
                     recyclerView.setAdapter(loadAdapter); // Set loadAdapter for non-truckers
                 }
@@ -159,6 +179,24 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
                     startActivity(intent);
                 }
+
+//                else if (id == R.id.nav_1)
+//                {
+//                    Intent intent = new Intent(Home.this, loadView.class);
+//                    if (getIntent().getExtras() != null && getIntent().getExtras().containsKey("EMAIL_KEY")) {
+//                        String email = getIntent().getStringExtra("EMAIL_KEY");
+//                        intent.putExtra("EMAIL_KEY", email);
+//
+//                    }
+//
+//
+//
+//
+//
+//                    startActivity(intent);
+//                }
+
+
 
                 // Close the drawer after handling the click event
                 drawerLayout.closeDrawer(GravityCompat.START);

@@ -11,6 +11,8 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import com.example.truckflow.databinding.ActivityLoadBinding;
 import com.example.truckflow.R;
@@ -53,6 +55,10 @@ public class LoadActivity extends AppCompatActivity {
 
     private Load load;
     private Double durationInHours;
+
+    private boolean isEditTextEmpty(EditText editText) {
+        return editText.getText().toString().trim().isEmpty();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -224,56 +230,60 @@ public class LoadActivity extends AppCompatActivity {
         binding.button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(LoadActivity.this, Home.class);
-                //post intent here
 
-                UUID uuid = UUID.randomUUID();
-                loadName = binding.loadName.getText().toString();
-                Log.i("Load Name::Load Act::",loadName);
 
-                loadDescription = binding.loadDescription.getEditableText().toString();
-                Log.i("Load Name::Load Act::",loadName);
-                load.setLoadName(loadName);
-                load.setLoadDescription(loadDescription);
+                if (isEditTextEmpty(binding.loadName) || isEditTextEmpty(binding.loadDescription)) {
+                    // Show an error message indicating that all fields are required
+                    Toast.makeText(LoadActivity.this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
+                } else {
 
-                String username = sharedPreferences.getString("email", null);
-                load.setContactInformation(username);
-                Log.i("Username",username);
-                databaseRef.child("Load").child(String.valueOf(uuid)).setValue(load)
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void unused) {
-                                Log.d(TAG, "Load data saved to Firebase Realtime Database");
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.e(TAG, "Error saving Load data to Firebase Realtime Database", e);
-                            }
-                        });
+                    Intent i = new Intent(LoadActivity.this, Home.class);
+                    //post intent here
 
-                db.collection("load")
-                        .add(load)
-                        .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                            @Override
-                            public void onSuccess(DocumentReference documentReference) {
-                                Log.d(TAG, "Trucker data saved to Firestore with ID: " + documentReference.getId());
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.e(TAG, "Error saving trucker data to Firestore", e);
-                            }
-                        });
-                startActivity(i);
+                    UUID uuid = UUID.randomUUID();
+                    loadName = binding.loadName.getText().toString();
+                    Log.i("Load Name::Load Act::", loadName);
 
+                    loadDescription = binding.loadDescription.getEditableText().toString();
+                    Log.i("Load Name::Load Act::", loadName);
+                    load.setLoadName(loadName);
+                    load.setLoadDescription(loadDescription);
+
+                    String username = sharedPreferences.getString("email", null);
+                    load.setContactInformation(username);
+                    Log.i("Username", username);
+                    databaseRef.child("Load").child(String.valueOf(uuid)).setValue(load)
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void unused) {
+                                    Log.d(TAG, "Load data saved to Firebase Realtime Database");
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.e(TAG, "Error saving Load data to Firebase Realtime Database", e);
+                                }
+                            });
+
+                    db.collection("load")
+                            .add(load)
+                            .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                @Override
+                                public void onSuccess(DocumentReference documentReference) {
+                                    Log.d(TAG, "Trucker data saved to Firestore with ID: " + documentReference.getId());
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.e(TAG, "Error saving trucker data to Firestore", e);
+                                }
+                            });
+                    startActivity(i);
+
+                }
             }
-        });
+            });
 
-
-    }
-
-
-}
+}}

@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,6 +26,7 @@ import com.example.truckflow.entities.DistanceMatrixResponse;
 import com.example.truckflow.entities.Duration;
 import com.example.truckflow.entities.Element;
 import com.example.truckflow.entities.Row;
+import com.example.truckflow.home.Home;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -70,6 +72,11 @@ public class LoadActivityThree extends AppCompatActivity implements OnMapReadyCa
 
     private String distanceH,durationH;
     private int distanceV,durationV;
+
+    private boolean isEditTextEmpty(EditText editText) {
+        return editText.getText().toString().trim().isEmpty();
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -167,18 +174,29 @@ public class LoadActivityThree extends AppCompatActivity implements OnMapReadyCa
 
 
         Button postLoadButton = binding.dropLocButton;
+
         postLoadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String origin = "";
-                Bundle extras = getIntent().getExtras();
-                if (extras != null) {
+                if (isEditTextEmpty((EditText) unitTV) || isEditTextEmpty((EditText) streetNameTV) || isEditTextEmpty((EditText) cityTV) ||
+                        isEditTextEmpty((EditText) provinceTV) || isEditTextEmpty((EditText) countryTV) || isEditTextEmpty((EditText) zipcodeTV) ||
+                        selectedDate == null || fullAddress == null) {
 
-                    origin = extras.getString("addressPU");
-                    String destination = fullAddress;
-                    getDistance(origin, destination);
+                    // Show an error message indicating that all fields are required
+                    Toast.makeText(LoadActivityThree.this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
+                } else {
+                    String origin = "";
+                    Bundle extras = getIntent().getExtras();
+                    if (extras != null) {
+                        // ... (rest of the code)
+
+                        origin = extras.getString("addressPU");
+                        String destination = fullAddress;
+
+                        // Proceed with the getDistance method call and other actions
+                        getDistance(origin, destination);
+                    }
                 }
-
             }
         });
     }
@@ -267,55 +285,72 @@ public class LoadActivityThree extends AppCompatActivity implements OnMapReadyCa
                 Toast.makeText(getApplicationContext(), "Response :" + response.toString(), Toast.LENGTH_LONG).show();//display the response on screen
                 Bundle extras = getIntent().getExtras();
                 if (extras != null) {
+
+                    String role = extras.getString("role");
+                    String email = extras.getString("EMAIL_KEY");
+
+                    if (role != null && role.equals("trucker")) {
+                        // Start Home activity for trucker
+                        Intent homeIntent = new Intent(LoadActivityThree.this, Home.class);
+                        // Rest of the code...
+                        startActivity(homeIntent);
+                        finish(); // Close this activity
+                    }
+
+                    else {
+                        String streetNumberPU = extras.getString("streetNumberPU");
+                        String streetNamePU = extras.getString("streetNamePU");
+                        String cityPU = extras.getString("cityPU");
+                        String statePU = extras.getString("statePU");
+                        String countryPU = extras.getString("countryPU");
+                        String postalCodePU = extras.getString("postalCodePU");
+                        String longitudePU = extras.getString("longitudePU");
+                        String latitudePU = extras.getString("latitudePU");
+
+
+
+                        String datePU = extras.getString("datePU");
+
+                        String origin = extras.getString("addressPU");
+
+                        String destination = fullAddress;
+                        Intent currentIntent = new Intent(LoadActivityThree.this,LoadActivity.class);
+                        currentIntent.putExtra("streetNumberPU",streetNumberPU);
+                        currentIntent.putExtra("streetNamePU",streetNamePU);
+                        currentIntent.putExtra("cityPU",cityPU);
+                        currentIntent.putExtra("statePU",statePU);
+                        currentIntent.putExtra("countryPU",countryPU);
+                        currentIntent.putExtra("postalCodePU",postalCodePU);
+                        currentIntent.putExtra("longitudePU",longitudePU);
+                        currentIntent.putExtra("latitudePU",latitudePU);
+                        currentIntent.putExtra("datePU",datePU);
+                        currentIntent.putExtra("longitudeDel",longitude);
+                        currentIntent.putExtra("latitudeDel", latitude);
+                        //full address
+                        String fullAddressOri = streetNumberPU + " " + streetNamePU + ", " + city + ", " + state + ", " + country + " " + postalCode;
+                        currentIntent.putExtra("addressPU",fullAddressOri);
+
+                        currentIntent.putExtra("streetNumberPU",streetNumber);
+                        currentIntent.putExtra("streetNamePU",streetName);
+                        currentIntent.putExtra("cityPU",city);
+                        currentIntent.putExtra("statePU",state);
+                        currentIntent.putExtra("countryPU",country);
+                        currentIntent.putExtra("postalCodePU",postalCode);
+                        currentIntent.putExtra("longitudePU",longitude);
+                        currentIntent.putExtra("latitudePU",latitude);
+                        currentIntent.putExtra("distance",distanceV);
+                        currentIntent.putExtra("duration",durationV);
+
+                        currentIntent.putExtra("dateDel",selectedDate);
+                        //full address
+                        String fullAddressDel = streetNumber + " " + streetName
+                                + ", " + city + ", " + state + ", " + country + " " + postalCode;
+                        currentIntent.putExtra("addressDel",fullAddressDel);
+                        startActivity(currentIntent);
+                    }
+                    }
                     //getting the values from the old ones
-                    String streetNumberPU = extras.getString("streetNumberPU");
-                    String streetNamePU = extras.getString("streetNamePU");
-                    String cityPU = extras.getString("cityPU");
-                    String statePU = extras.getString("statePU");
-                    String countryPU = extras.getString("countryPU");
-                    String postalCodePU = extras.getString("postalCodePU");
-                    String longitudePU = extras.getString("longitudePU");
-                    String latitudePU = extras.getString("latitudePU");
 
-                    String datePU = extras.getString("datePU");
-
-                    String origin = extras.getString("addressPU");
-
-                    String destination = fullAddress;
-                    Intent currentIntent = new Intent(LoadActivityThree.this,LoadActivity.class);
-                    currentIntent.putExtra("streetNumberPU",streetNumberPU);
-                    currentIntent.putExtra("streetNamePU",streetNamePU);
-                    currentIntent.putExtra("cityPU",cityPU);
-                    currentIntent.putExtra("statePU",statePU);
-                    currentIntent.putExtra("countryPU",countryPU);
-                    currentIntent.putExtra("postalCodePU",postalCodePU);
-                    currentIntent.putExtra("longitudePU",longitudePU);
-                    currentIntent.putExtra("latitudePU",latitudePU);
-                    currentIntent.putExtra("datePU",datePU);
-                    currentIntent.putExtra("longitudeDel",longitude);
-                    currentIntent.putExtra("latitudeDel", latitude);
-                    //full address
-                    String fullAddressOri = streetNumberPU + " " + streetNamePU + ", " + city + ", " + state + ", " + country + " " + postalCode;
-                    currentIntent.putExtra("addressPU",fullAddressOri);
-
-                    currentIntent.putExtra("streetNumberPU",streetNumber);
-                    currentIntent.putExtra("streetNamePU",streetName);
-                    currentIntent.putExtra("cityPU",city);
-                    currentIntent.putExtra("statePU",state);
-                    currentIntent.putExtra("countryPU",country);
-                    currentIntent.putExtra("postalCodePU",postalCode);
-                    currentIntent.putExtra("longitudePU",longitude);
-                    currentIntent.putExtra("latitudePU",latitude);
-                    currentIntent.putExtra("distance",distanceV);
-                    currentIntent.putExtra("duration",durationV);
-
-                    currentIntent.putExtra("dateDel",selectedDate);
-                    //full address
-                    String fullAddressDel = streetNumber + " " + streetName
-                            + ", " + city + ", " + state + ", " + country + " " + postalCode;
-                    currentIntent.putExtra("addressDel",fullAddressDel);
-                    startActivity(currentIntent);
-                }
             }
         }, new Response.ErrorListener() {
             @Override
